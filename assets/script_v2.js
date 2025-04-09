@@ -3,27 +3,63 @@ const API_URL = 'https://galeria-backend-production.up.railway.app';
 document.addEventListener('DOMContentLoaded', async () => {
   let allFiles = [];
 
-  // Login automático com usuário e senha fixos
-  async function login() {
+  // Função para login manual
+  async function login(username, password) {
     try {
       const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: 'admin',
-          password: 'senhaSuperSecreta'
-        })
+        body: JSON.stringify({ username, password })
       });
       if (!res.ok) throw new Error('Credenciais inválidas');
       const data = await res.json();
       localStorage.setItem('token', data.token);
+      document.getElementById('loginContainer').style.display = 'none';
+      document.getElementById('appContainer').style.display = 'block';
+      fetchGallery();
+      fetchStats();
     } catch (err) {
-      console.error('Erro ao fazer login:', err);
-      alert('Erro ao fazer login');
+      alert('Usuário ou senha incorretos');
     }
   }
 
-  await login();
+  // Cria elementos de login
+  const loginContainer = document.createElement('div');
+  loginContainer.id = 'loginContainer';
+  loginContainer.style.display = 'flex';
+  loginContainer.style.flexDirection = 'column';
+  loginContainer.style.alignItems = 'center';
+  loginContainer.style.justifyContent = 'center';
+  loginContainer.style.height = '100vh';
+  loginContainer.innerHTML = `
+    <h2>Login</h2>
+    <input id="usernameInput" placeholder="Usuário" style="margin:5px; padding:8px; width:200px;">
+    <input id="passwordInput" type="password" placeholder="Senha" style="margin:5px; padding:8px; width:200px;">
+    <button id="loginBtn" style="margin:5px; padding:8px 16px;">Entrar</button>
+  `;
+  document.body.appendChild(loginContainer);
+
+  const appContainer = document.createElement('div');
+  appContainer.id = 'appContainer';
+  appContainer.style.display = 'none';
+  while(document.body.firstChild !== loginContainer){
+    appContainer.appendChild(document.body.firstChild);
+  }
+  document.body.appendChild(appContainer);
+
+  document.getElementById('loginBtn').onclick = () => {
+    const username = document.getElementById('usernameInput').value;
+    const password = document.getElementById('passwordInput').value;
+    login(username, password);
+  };
+
+  // Se já estiver logado, mostra app
+  if(localStorage.getItem('token')){
+    loginContainer.style.display = 'none';
+    appContainer.style.display = 'block';
+    fetchGallery();
+    fetchStats();
+  }
 
   async function fetchGallery() {
     try {
