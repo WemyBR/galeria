@@ -120,7 +120,22 @@ const res = await fetch(`${API_URL}/list`, {
       video.autoplay = true;
       content.appendChild(video);
     }
-    document.getElementById('lightbox').style.display = 'flex';
+    const lightbox = document.getElementById('lightbox');
+    lightbox.style.display = 'flex';
+
+    // Fechar ao clicar fora do conteúdo
+    lightbox.onclick = (e) => {
+      if (e.target === lightbox) {
+        lightbox.style.display = 'none';
+      }
+    };
+
+    // Fechar com ESC
+    document.onkeydown = (e) => {
+      if (e.key === 'Escape') {
+        lightbox.style.display = 'none';
+      }
+    };
   }
 
   document.getElementById('lightboxClose').onclick = () => {
@@ -231,6 +246,15 @@ const res = await fetch(`${API_URL}/stats`, {
 
   fetchGallery();
   fetchStats();
+
+  // Atualização em tempo real via Socket.IO
+  const socket = io(API_URL, {
+    transports: ['websocket']
+  });
+  socket.on('update', () => {
+    fetchGallery();
+    fetchStats();
+  });
 
   // Drag and drop upload
   const dropOverlay = document.getElementById('dropOverlay');
