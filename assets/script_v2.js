@@ -1,11 +1,37 @@
 const API_URL = 'https://galeria-backend-production.up.railway.app';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   let allFiles = [];
+
+  // Login automático com usuário e senha fixos
+  async function login() {
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: 'admin',
+          password: 'senhaSuperSecreta'
+        })
+      });
+      if (!res.ok) throw new Error('Credenciais inválidas');
+      const data = await res.json();
+      localStorage.setItem('token', data.token);
+    } catch (err) {
+      console.error('Erro ao fazer login:', err);
+      alert('Erro ao fazer login');
+    }
+  }
+
+  await login();
 
   async function fetchGallery() {
     try {
-      const res = await fetch(`${API_URL}/list`);
+const res = await fetch(`${API_URL}/list`, {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    });
       allFiles = await res.json();
       renderGallery();
     } catch {
@@ -108,7 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fileInput').addEventListener('change', () => {
     const formData = new FormData(document.getElementById('uploadForm'));
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${API_URL}/upload`);
+xhr.open('POST', `${API_URL}/upload`);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
 
     xhr.upload.onprogress = e => {
       if(e.lengthComputable){
@@ -148,9 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if(selected.length === 0) return alert('Selecione pelo menos um arquivo');
     if(!confirm('Tem certeza que deseja excluir os arquivos selecionados?')) return;
     try {
-      const res = await fetch(`${API_URL}/delete`, {
+const res = await fetch(`${API_URL}/delete`, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
         body: JSON.stringify({ files: selected })
       });
       if(res.ok){
@@ -186,7 +216,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchStats(){
     try {
-      const res = await fetch(`${API_URL}/stats`);
+const res = await fetch(`${API_URL}/stats`, {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    });
       const stats = await res.json();
       document.getElementById('stats').innerText =
         `Total: ${stats.total} arquivos | Fotos: ${stats.photos} | Vídeos: ${stats.videos} | Espaço: ${stats.sizeMB} MB`;
@@ -226,7 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
       fileInput.files = dt.files;
       const formData = new FormData(uploadForm);
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${API_URL}/upload`);
+xhr.open('POST', `${API_URL}/upload`);
+      xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
       xhr.onload = () => {
         fetchGallery();
         fetchStats();
