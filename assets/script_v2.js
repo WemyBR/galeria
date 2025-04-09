@@ -293,6 +293,31 @@ const res = await fetch(`${API_URL}/stats`, {
     fetchStats();
   });
 
+  // Pull to refresh no celular
+  let touchStartY = 0;
+  let isPulling = false;
+
+  window.addEventListener('touchstart', (e) => {
+    if (window.scrollY === 0) {
+      touchStartY = e.touches[0].clientY;
+      isPulling = true;
+    }
+  });
+
+  window.addEventListener('touchmove', (e) => {
+    if (!isPulling) return;
+    const currentY = e.touches[0].clientY;
+    if (currentY - touchStartY > 80) { // puxou mais de 80px para baixo
+      isPulling = false;
+      fetchGallery();
+      fetchStats();
+    }
+  });
+
+  window.addEventListener('touchend', () => {
+    isPulling = false;
+  });
+
   // Drag and drop upload
   const dropOverlay = document.getElementById('dropOverlay');
   const uploadForm = document.getElementById('uploadForm');
