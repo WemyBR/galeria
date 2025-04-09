@@ -1,4 +1,4 @@
-const API_URL = 'https://galeria-production-fa7e.up.railway.app';
+const API_URL = 'https://galeria-backend-production.up.railway.app';
 // const socket = io(API_URL);
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('downloadSelected').addEventListener('click', () => {
-const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked'))
+    const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked'))
       .map(cb => cb.value);
     if(selected.length === 0){
       alert('Selecione pelo menos um arquivo para baixar.');
@@ -192,7 +192,7 @@ const selected = Array.from(document.querySelectorAll('.gallery input[type="chec
   });
 
   document.getElementById('deleteSelected').addEventListener('click', async () => {
-const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked'))
+    const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked`))
       .map(cb => cb.value);
     if(selected.length === 0){
       alert('Selecione pelo menos um arquivo para excluir.');
