@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Filtro por texto
     const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
     if(searchTerm){
-      files = files.filter(file => file.name.toLowerCase().includes(searchTerm));
+      files = files.filter(file => file.toLowerCase().includes(searchTerm));
     }
 
     // Filtro por tipo
@@ -134,41 +134,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', `${API_URL}/upload`);
 
-    const startTime = Date.now();
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percent = (event.loaded / event.total) * 100;
-        document.getElementById('progressContainer').style.display = 'block';
-        document.getElementById('progressBar').style.width = percent + '%';
-
-        const currentTime = Date.now();
-        const timeElapsed = (currentTime - startTime) / 1000;
-        const bytesUploaded = event.loaded;
-        const speed = bytesUploaded / timeElapsed;
-        const remainingBytes = event.total - bytesUploaded;
-        const estimatedTime = speed > 0 ? remainingBytes / speed : 0;
-
-        const speedKBs = (speed / 1024).toFixed(1);
-        const estSeconds = estimatedTime.toFixed(1);
-
-        document.getElementById('progressDetails').innerText =
-          `${percent.toFixed(1)}% - ${speedKBs} KB/s - ${estSeconds}s restantes`;
-      }
-    };
-
     xhr.onload = () => {
-      document.getElementById('progressContainer').style.display = 'none';
-      document.getElementById('progressBar').style.width = '0%';
-      document.getElementById('progressDetails').innerText = '';
-      document.getElementById('message').innerText = 'Upload concluído!';
-      e.target.value = '';
       fetchGallery();
       fetchStats();
     };
 
     xhr.onerror = () => {
-      document.getElementById('message').innerText = 'Erro no upload.';
+      alert('Erro no upload.');
     };
 
     xhr.send(formData);
@@ -192,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('deleteSelected').addEventListener('click', async () => {
-    const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked`))
+    const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked'))
       .map(cb => cb.value);
     if(selected.length === 0){
       alert('Selecione pelo menos um arquivo para excluir.');
@@ -242,48 +214,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   fetchGallery();
-
-  // Atualização em tempo real
-  // socket.on('update', () => {
-  //   fetchGallery();
-  //   fetchStats();
-  // });
-
-  // Drag and drop upload
-  const dropOverlay = document.getElementById('dropOverlay');
-  const uploadForm = document.getElementById('uploadForm');
-  const fileInput = document.getElementById('fileInput');
-
-  window.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropOverlay.style.display = 'flex';
-  });
-
-  window.addEventListener('dragleave', (e) => {
-    if (e.target === dropOverlay) {
-      dropOverlay.style.display = 'none';
-    }
-  });
-
-  window.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropOverlay.style.display = 'none';
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      const dataTransfer = new DataTransfer();
-      for (const file of files) {
-        dataTransfer.items.add(file);
-      }
-      fileInput.files = dataTransfer.files;
-
-      const formData = new FormData(uploadForm);
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${API_URL}/upload`);
-      xhr.onload = () => {
-        fetchGallery();
-      };
-      xhr.send(formData);
-    }
-  });
 });
