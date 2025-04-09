@@ -1,5 +1,5 @@
 const API_URL = 'https://galeria-production-fa7e.up.railway.app';
-const socket = io(API_URL);
+// const socket = io(API_URL);
 
 document.addEventListener('DOMContentLoaded', () => {
   let allFiles = [];
@@ -244,10 +244,10 @@ const selected = Array.from(document.querySelectorAll('.gallery input[type="chec
   fetchGallery();
 
   // Atualização em tempo real
-  socket.on('update', () => {
-    fetchGallery();
-    fetchStats();
-  });
+  // socket.on('update', () => {
+  //   fetchGallery();
+  //   fetchStats();
+  // });
 
   // Drag and drop upload
   const dropOverlay = document.getElementById('dropOverlay');
