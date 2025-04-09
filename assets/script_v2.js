@@ -1,10 +1,11 @@
-const socket = io();
+const API_URL = 'https://galeria-production-fa7e.up.railway.app';
+const socket = io(API_URL);
 
 document.addEventListener('DOMContentLoaded', () => {
   let allFiles = [];
 
   async function fetchGallery() {
-    const res = await fetch('/list');
+    const res = await fetch(`${API_URL}/list`);
     allFiles = await res.json();
     renderGallery();
   }
@@ -58,13 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
       let mediaElement;
       if(['jpg','jpeg','png','gif','webp'].includes(ext)){
         mediaElement = document.createElement('img');
-        mediaElement.src = '/uploads/' + file;
+        mediaElement.src = `${API_URL}/uploads/${file}`;
         mediaElement.style.cursor = 'pointer';
         mediaElement.onclick = () => openLightbox('img', mediaElement.src);
       } else if(['mp4','webm','ogg','mov'].includes(ext)){
         mediaElement = document.createElement('video');
         mediaElement.controls = true;
-        mediaElement.src = '/uploads/' + file;
+        mediaElement.src = `${API_URL}/uploads/${file}`;
         mediaElement.style.cursor = 'pointer';
         mediaElement.onclick = () => openLightbox('video', mediaElement.src);
       }
@@ -131,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formData = new FormData(document.getElementById('uploadForm'));
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/upload');
+    xhr.open('POST', `${API_URL}/upload`);
 
     const startTime = Date.now();
 
@@ -163,22 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('message').innerText = 'Upload concluído!';
       e.target.value = '';
       fetchGallery();
-  fetchStats();
-
-  async function fetchStats() {
-    console.log('Buscando estatísticas...');
-    try {
-      const res = await fetch('/stats');
-      const stats = await res.json();
-      console.log('Resposta /stats:', stats);
-      document.getElementById('stats').innerText =
-        `Total: ${stats.total} arquivos | Fotos: ${stats.photos} | Vídeos: ${stats.videos} | Espaço: ${stats.sizeMB} MB`;
-    } catch (error) {
-      console.error('Erro ao buscar /stats:', error);
-      document.getElementById('stats').innerText = 'Erro ao carregar estatísticas';
-    }
-  }
-      setTimeout(() => document.getElementById('message').innerText = '', 3000);
+      fetchStats();
     };
 
     xhr.onerror = () => {
@@ -189,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('downloadSelected').addEventListener('click', () => {
-    const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked'))
+const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked'))
       .map(cb => cb.value);
     if(selected.length === 0){
       alert('Selecione pelo menos um arquivo para baixar.');
@@ -197,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     selected.forEach(file => {
       const link = document.createElement('a');
-      link.href = '/uploads/' + file;
+      link.href = `${API_URL}/uploads/${file}`;
       link.download = file;
       document.body.appendChild(link);
       link.click();
@@ -206,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('deleteSelected').addEventListener('click', async () => {
-    const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked'))
+const selected = Array.from(document.querySelectorAll('.gallery input[type="checkbox"]:checked'))
       .map(cb => cb.value);
     if(selected.length === 0){
       alert('Selecione pelo menos um arquivo para excluir.');
@@ -215,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!confirm('Tem certeza que deseja excluir os arquivos selecionados?')) return;
 
     try {
-      const response = await fetch('/delete', {
+      const response = await fetch(`${API_URL}/delete`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ files: selected })
@@ -293,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(uploadForm);
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/upload');
+      xhr.open('POST', `${API_URL}/upload`);
       xhr.onload = () => {
         fetchGallery();
       };
