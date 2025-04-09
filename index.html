@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Galeria do Celular</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+<div class="overlay" id="dropOverlay">Solte os arquivos aqui para enviar</div>
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" id="lightboxClose">&times;</span>
+  <div class="lightbox-content" id="lightboxContent"></div>
+</div>
+<header>
+  <button onclick="document.getElementById('fileInput').click()">Adicionar</button>
+  <button id="downloadSelected">Baixar Selecionados</button>
+  <button id="deleteSelected">Excluir Selecionados</button>
+  <button id="toggleTheme">🌙</button>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="files" multiple accept="image/*,video/*" style="display:none" />
+  </form>
+</header>
+
+<div id="stats" style="margin:15px; font-size:14px; color:#333; text-align:center;"></div>
+
+<div style="text-align:center; margin: 15px;">
+  <input type="text" id="searchInput" placeholder="Buscar arquivos..." style="padding:5px 10px; border-radius:6px; border:1px solid #ccc; width:200px; margin-right:20px;">
+  <label>Ordenar por:
+    <select id="sortSelect">
+      <option value="name-asc">Nome (A-Z)</option>
+      <option value="name-desc">Nome (Z-A)</option>
+    </select>
+  </label>
+  <label style="margin-left:20px;">Filtrar:
+    <select id="filterSelect">
+      <option value="all">Todos</option>
+      <option value="images">Fotos</option>
+      <option value="videos">Vídeos</option>
+    </select>
+  </label>
+</div>
+
+<div class="container">
+  <div id="progressContainer">
+    <div id="progressBar"></div>
+    <div id="progressDetails" style="font-size: 12px; margin-top: 5px; text-align: center;"></div>
+  </div>
+  <div id="message"></div>
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="assets/script_v2.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(reg => console.log('Service Worker registrado:', reg))
+    .catch(err => console.error('Erro ao registrar Service Worker:', err));
+}
+</script>
+</body>
+</html>
