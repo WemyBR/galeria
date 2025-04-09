@@ -285,7 +285,8 @@ const res = await fetch(`${API_URL}/stats`, {
 
   // Atualização em tempo real via Socket.IO
   const socket = io(API_URL, {
-    transports: ['websocket']
+    transports: ['polling'], // força long polling para Railway
+    upgrade: false
   });
   socket.on('update', () => {
     fetchGallery();
